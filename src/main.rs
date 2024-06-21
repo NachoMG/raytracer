@@ -14,7 +14,7 @@ fn main() {
 
     let focal_length = 1.0;
     let viewport_height = 2.0;
-    let viewport_width = viewport_height * ((image_width / image_height) as f64);
+    let viewport_width = viewport_height * (image_width as f64 / image_height as f64);
     let camera_center = Vector3::new(0.0, 0.0, 0.0);
 
     let viewport_u = Vector3::new(viewport_width, 0.0, 0.0);
