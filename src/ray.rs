@@ -13,4 +13,10 @@ impl Ray {
     pub fn at(&self, t: f64) -> Vector3 {
         self.origin + t * self.direction
     }
+
+    pub fn color(&self) -> Vector3 {
+        let unit_direction = self.direction.unit_vector();
+        let a = 0.5 * (unit_direction[1] + 1.0);
+        (1.0 - a) * Vector3::new(1.0, 1.0, 1.0) + a * Vector3::new(0.5, 0.7, 1.0)
+    }
 }
