@@ -5,6 +5,7 @@ use vec3::Vector3;
 mod color;
 mod hittable;
 mod ray;
+mod sphere;
 mod vec3;
 
 fn main() {
