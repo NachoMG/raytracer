@@ -31,6 +31,7 @@ pub trait Hittable {
     fn hit(&self, r: &Ray, ray_tmin: f64, ray_tmax: f64) -> Option<HitRecord>;
 }
 
+#[derive(Default)]
 pub struct HittableList {
     list: Vec<Box<dyn Hittable>>,
 }

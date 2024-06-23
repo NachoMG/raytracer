@@ -1,4 +1,9 @@
-use crate::vec3::Vector3;
+use std::f64::INFINITY;
+
+use crate::{
+    hittable::{Hittable, HittableList},
+    vec3::Vector3,
+};
 
 pub struct Ray {
     pub origin: Vector3,
@@ -14,12 +19,10 @@ impl Ray {
         self.origin + t * self.direction
     }
 
-    pub fn color(&self) -> Vector3 {
-        // let t = self.hit_sphere(Vector3::new(0.0, 0.0, -1.0), 0.5);
-        // if t > 0.0 {
-        //     let n = (self.at(t) - Vector3::new(0.0, 0.0, -1.0)).unit_vector();
-        //     return 0.5 * Vector3::new(n[0] + 1.0, n[1] + 1.0, n[2] + 1.0);
-        // }
+    pub fn color(&self, hittable_list: &HittableList) -> Vector3 {
+        if let Some(hit_record) = hittable_list.hit(self, 0.0, INFINITY) {
+            return 0.5 * (hit_record.normal + Vector3::new(1.0, 1.0, 1.0));
+        }
 
         let unit_direction = self.direction.unit_vector();
         let a = 0.5 * (unit_direction[1] + 1.0);
