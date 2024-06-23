@@ -17,7 +17,7 @@ impl HitRecord {
         }
     }
 
-    pub fn set_face_normal(&mut self, r: Ray, outward_normal: Vector3) {
+    pub fn set_face_normal(&mut self, r: &Ray, outward_normal: Vector3) {
         self.front_face = r.direction.dot(outward_normal) < 0.0;
         if self.front_face {
             self.normal = outward_normal;
@@ -28,5 +28,31 @@ impl HitRecord {
 }
 
 pub trait Hittable {
-    fn hit(&self, r: Ray, ray_tmin: f64, ray_tmax: f64) -> Option<HitRecord>;
+    fn hit(&self, r: &Ray, ray_tmin: f64, ray_tmax: f64) -> Option<HitRecord>;
+}
+
+pub struct HittableList {
+    list: Vec<Box<dyn Hittable>>,
+}
+
+impl HittableList {
+    pub fn push(&mut self, hittable: impl Hittable + 'static) {
+        self.list.push(Box::new(hittable));
+    }
+}
+
+impl Hittable for HittableList {
+    fn hit(&self, r: &Ray, ray_tmin: f64, ray_tmax: f64) -> Option<HitRecord> {
+        let mut hit_anything: Option<HitRecord> = None;
+        let mut closest_so_far = ray_tmax;
+
+        for h in self.list.iter() {
+            if let Some(hit) = h.hit(r, ray_tmin, closest_so_far) {
+                closest_so_far = hit.t;
+                hit_anything = Some(hit);
+            }
+        }
+
+        hit_anything
+    }
 }
