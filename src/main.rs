@@ -3,6 +3,7 @@ use ray::Ray;
 use vec3::Vector3;
 
 mod color;
+mod hittable;
 mod ray;
 mod vec3;
 
