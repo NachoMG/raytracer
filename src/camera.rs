@@ -1,4 +1,9 @@
-use crate::{color::write_color, hittable::HittableList, ray::Ray, vec3::Vector3};
+use crate::{
+    color::{ray_color, write_color},
+    hittable::HittableList,
+    ray::Ray,
+    vec3::Vector3,
+};
 
 pub struct Camera {
     aspect_ratio: f64,
@@ -62,7 +67,7 @@ impl Camera {
                     + ((j as f64) * self.pixel_delta_v);
                 let ray_direction = pixel_center - self.center;
                 let ray = Ray::new(self.center, ray_direction);
-                write_color(ray.color(&world));
+                write_color(ray_color(&ray, &world));
             }
         }
 
