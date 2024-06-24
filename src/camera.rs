@@ -1,3 +1,5 @@
+use rand::Rng;
+
 use crate::{
     color::{ray_color, write_color},
     hittable::HittableList,
@@ -13,14 +15,18 @@ pub struct Camera {
     pixel00_loc: Vector3,
     pixel_delta_u: Vector3,
     pixel_delta_v: Vector3,
+    samples_per_pixel: i32,
+    pixel_samples_scale: f64,
 }
 
 impl Camera {
-    pub fn new(image_width: i32, aspect_ratio: f64) -> Camera {
+    pub fn new(image_width: i32, aspect_ratio: f64, samples_per_pixel: i32) -> Camera {
         let mut image_height = ((image_width as f64) / aspect_ratio) as i32;
         if image_height < 1 {
             image_height = 1;
         }
+
+        let pixel_samples_scale = 1.0 / (samples_per_pixel as f64);
 
         let center = Vector3::new(0.0, 0.0, 0.0);
 
@@ -50,7 +56,26 @@ impl Camera {
             pixel00_loc,
             pixel_delta_u,
             pixel_delta_v,
+            samples_per_pixel,
+            pixel_samples_scale,
         }
+    }
+
+    fn sample_square() -> Vector3 {
+        let mut rnd = rand::thread_rng();
+        Vector3::new(rnd.gen::<f64>() - 0.5, rnd.gen::<f64>() - 0.5, 0.0)
+    }
+
+    fn get_ray(&self, i: i32, j: i32) -> Ray {
+        let offset = Camera::sample_square();
+        let pixel_sample = self.pixel00_loc
+            + (((i as f64) + offset[0]) * self.pixel_delta_u)
+            + (((j as f64) + offset[0]) * self.pixel_delta_v);
+
+        let ray_origin = self.center;
+        let ray_direction = pixel_sample - ray_origin;
+
+        Ray::new(ray_origin, ray_direction)
     }
 
     pub fn render(&self, world: HittableList) {
@@ -62,12 +87,12 @@ impl Camera {
             eprint!("\rScanlines remaining: {}", self.image_height - j - 1);
 
             for i in 0..self.image_width {
-                let pixel_center = self.pixel00_loc
-                    + ((i as f64) * self.pixel_delta_u)
-                    + ((j as f64) * self.pixel_delta_v);
-                let ray_direction = pixel_center - self.center;
-                let ray = Ray::new(self.center, ray_direction);
-                write_color(ray_color(&ray, &world));
+                let mut pixel_color = Vector3::new(0.0, 0.0, 0.0);
+                for _ in 0..self.samples_per_pixel {
+                    let ray = self.get_ray(i, j);
+                    pixel_color += ray_color(&ray, &world);
+                }
+                write_color(self.pixel_samples_scale * pixel_color);
             }
         }
 

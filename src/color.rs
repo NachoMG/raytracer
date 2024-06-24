@@ -7,9 +7,9 @@ use crate::{
 };
 
 pub fn write_color(pixel_color: Vector3) {
-    let ir = (255.999 * pixel_color[0]) as u64;
-    let ig = (255.999 * pixel_color[1]) as u64;
-    let ib = (255.999 * pixel_color[2]) as u64;
+    let ir = (256 as f64 * pixel_color[0].clamp(0.0, 0.999)) as u64;
+    let ig = (256 as f64 * pixel_color[1].clamp(0.0, 0.999)) as u64;
+    let ib = (256 as f64 * pixel_color[2].clamp(0.0, 0.999)) as u64;
 
     println!("{} {} {}", ir, ig, ib);
 }
