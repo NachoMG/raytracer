@@ -1,9 +1,4 @@
-use std::f64::INFINITY;
-
-use crate::{
-    hittable::{Hittable, HittableList},
-    vec3::Vector3,
-};
+use crate::vec3::Vector3;
 
 pub struct Ray {
     pub origin: Vector3,
