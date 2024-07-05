@@ -6,10 +6,22 @@ use crate::{
     vec3::Vector3,
 };
 
+pub fn linear_to_gamma(linear_component: f64) -> f64 {
+    if linear_component > 0.0 {
+        linear_component.sqrt()
+    } else {
+        0.0
+    }
+}
+
 pub fn write_color(pixel_color: Vector3) {
-    let ir = (256 as f64 * pixel_color[0].clamp(0.0, 0.999)) as u64;
-    let ig = (256 as f64 * pixel_color[1].clamp(0.0, 0.999)) as u64;
-    let ib = (256 as f64 * pixel_color[2].clamp(0.0, 0.999)) as u64;
+    let r = linear_to_gamma(pixel_color[0]);
+    let g = linear_to_gamma(pixel_color[1]);
+    let b = linear_to_gamma(pixel_color[2]);
+
+    let ir = (256 as f64 * r.clamp(0.0, 0.999)) as u64;
+    let ig = (256 as f64 * g.clamp(0.0, 0.999)) as u64;
+    let ib = (256 as f64 * b.clamp(0.0, 0.999)) as u64;
 
     println!("{} {} {}", ir, ig, ib);
 }
