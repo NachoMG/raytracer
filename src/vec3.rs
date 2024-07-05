@@ -1,5 +1,7 @@
 use std::ops::{Add, AddAssign, Div, Index, IndexMut, Mul, MulAssign, Neg, Sub, SubAssign};
 
+use rand::Rng;
+
 #[derive(Clone, Copy)]
 pub struct Vector3 {
     e: [f64; 3],
@@ -8,6 +10,15 @@ pub struct Vector3 {
 impl Vector3 {
     pub fn new(e0: f64, e1: f64, e2: f64) -> Vector3 {
         Vector3 { e: [e0, e1, e2] }
+    }
+
+    pub fn random(min: f64, max: f64) -> Vector3 {
+        let mut rng = rand::thread_rng();
+        Vector3::new(
+            rng.gen_range(min..max),
+            rng.gen_range(min..max),
+            rng.gen_range(min..max),
+        )
     }
 
     pub fn length(&self) -> f64 {
@@ -32,8 +43,30 @@ impl Vector3 {
         }
     }
 
-    pub fn unit_vector(self) -> Vector3 {
-        self / self.length()
+    pub fn unit_vector(&self) -> Vector3 {
+        *self / self.length()
+    }
+
+    pub fn random_in_unit_sphere() -> Vector3 {
+        loop {
+            let p = Vector3::random(-1.0, 1.0);
+            if p.length_squared() < 1.0 {
+                return p;
+            }
+        }
+    }
+
+    pub fn random_unit_vector() -> Vector3 {
+        let vec = Vector3::random_in_unit_sphere();
+        vec.unit_vector()
+    }
+
+    pub fn random_on_hemisphere(normal: Vector3) -> Vector3 {
+        let on_unit_sphere = Vector3::random_unit_vector();
+        if on_unit_sphere.dot(normal) > 0.0 {
+            return on_unit_sphere;
+        }
+        return -on_unit_sphere;
     }
 }
 

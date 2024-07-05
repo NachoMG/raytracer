@@ -16,7 +16,8 @@ pub fn write_color(pixel_color: Vector3) {
 
 pub fn ray_color(ray: &Ray, world: &HittableList) -> Vector3 {
     if let Some(hit_record) = world.hit(ray, 0.0, INFINITY) {
-        return 0.5 * (hit_record.normal + Vector3::new(1.0, 1.0, 1.0));
+        let direction = Vector3::random_on_hemisphere(hit_record.normal);
+        return 0.5 * ray_color(&Ray::new(hit_record.p, direction), world);
     }
 
     let unit_direction = ray.direction.unit_vector();
