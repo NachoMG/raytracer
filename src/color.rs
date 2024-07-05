@@ -20,7 +20,7 @@ pub fn ray_color(ray: &Ray, depth: i32, world: &HittableList) -> Vector3 {
     }
 
     if let Some(hit_record) = world.hit(ray, 0.001, INFINITY) {
-        let direction = Vector3::random_on_hemisphere(hit_record.normal);
+        let direction = hit_record.normal + Vector3::random_unit_vector();
         return 0.5 * ray_color(&Ray::new(hit_record.p, direction), depth - 1, world);
     }
 
