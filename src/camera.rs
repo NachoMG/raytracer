@@ -17,10 +17,16 @@ pub struct Camera {
     pixel_delta_v: Vector3,
     samples_per_pixel: i32,
     pixel_samples_scale: f64,
+    max_depth: i32,
 }
 
 impl Camera {
-    pub fn new(image_width: i32, aspect_ratio: f64, samples_per_pixel: i32) -> Camera {
+    pub fn new(
+        image_width: i32,
+        aspect_ratio: f64,
+        samples_per_pixel: i32,
+        max_depth: i32,
+    ) -> Camera {
         let mut image_height = ((image_width as f64) / aspect_ratio) as i32;
         if image_height < 1 {
             image_height = 1;
@@ -58,6 +64,7 @@ impl Camera {
             pixel_delta_v,
             samples_per_pixel,
             pixel_samples_scale,
+            max_depth,
         }
     }
 
@@ -90,7 +97,7 @@ impl Camera {
                 let mut pixel_color = Vector3::new(0.0, 0.0, 0.0);
                 for _ in 0..self.samples_per_pixel {
                     let ray = self.get_ray(i, j);
-                    pixel_color += ray_color(&ray, &world);
+                    pixel_color += ray_color(&ray, self.max_depth, &world);
                 }
                 write_color(self.pixel_samples_scale * pixel_color);
             }
