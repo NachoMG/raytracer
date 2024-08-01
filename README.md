@@ -11,4 +11,5 @@ This will generate `./image.ppm` with the rendered scene.
 Generated images during the developing process can be found [here](https://github.com/NachoMG/raytracer/tree/master/images).
 
 Final result:
+
 ![Example Image](images/image_12_mid_samples_ppx.jpg)
