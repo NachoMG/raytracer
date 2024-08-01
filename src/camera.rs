@@ -27,6 +27,9 @@ impl Camera {
         samples_per_pixel: i32,
         max_depth: i32,
         v_fov: f64,
+        look_from: Vector3,
+        look_at: Vector3,
+        vup: Vector3,
     ) -> Camera {
         let mut image_height = ((image_width as f64) / aspect_ratio) as i32;
         if image_height < 1 {
@@ -35,26 +38,30 @@ impl Camera {
 
         let pixel_samples_scale = 1.0 / (samples_per_pixel as f64);
 
-        let center = Vector3::new(0.0, 0.0, 0.0);
+        let center = look_from;
 
         // Determine viewport dimensions.
-        let focal_length = 1.0;
+        let focal_length = (look_from - look_at).length();
         let theta = degrees_to_radians(v_fov);
         let h = (theta / 2.0).tan();
         let viewport_height = 2.0 * h * focal_length;
         let viewport_width = viewport_height * (image_width as f64 / image_height as f64);
 
+        // Calculate the u,v,w unit basis vectors for the camera coordinate frame.
+        let w = (look_from - look_at).unit_vector();
+        let u = vup.cross(w).unit_vector();
+        let v = w.cross(u);
+
         // Calculate the vectors across the horizontal and down the vertical viewport edges.
-        let viewport_u = Vector3::new(viewport_width, 0.0, 0.0);
-        let viewport_v = Vector3::new(0.0, -viewport_height, 0.0);
+        let viewport_u = viewport_width * u; // Vector across viewport horizontal edge
+        let viewport_v = viewport_height * -v; // Vector down viewport vertical edge
 
         // Calculate the horizontal and vertical delta vectors from pixel to pixel.
         let pixel_delta_u = viewport_u / (image_width as f64);
         let pixel_delta_v = viewport_v / (image_height as f64);
 
         // Calculate the location of the upper left pixel.
-        let viewport_upper_left =
-            center - Vector3::new(0.0, 0.0, focal_length) - viewport_u / 2.0 - viewport_v / 2.0;
+        let viewport_upper_left = center - (focal_length * w) - viewport_u / 2.0 - viewport_v / 2.0;
         let pixel00_loc = viewport_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v);
 
         Camera {
