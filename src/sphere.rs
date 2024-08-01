@@ -1,5 +1,8 @@
+use std::sync::Arc;
+
 use crate::{
     hittable::{HitRecord, Hittable},
+    materials::Scatterable,
     ray::Ray,
     vec3::Vector3,
 };
@@ -7,11 +10,16 @@ use crate::{
 pub struct Sphere {
     center: Vector3,
     radius: f64,
+    material: Arc<dyn Scatterable>,
 }
 
 impl Sphere {
-    pub fn new(center: Vector3, radius: f64) -> Sphere {
-        Sphere { center, radius }
+    pub fn new(center: Vector3, radius: f64, material: Arc<dyn Scatterable>) -> Sphere {
+        Sphere {
+            center,
+            radius,
+            material,
+        }
     }
 }
 
@@ -37,7 +45,12 @@ impl Hittable for Sphere {
             }
         }
 
-        let mut rec = HitRecord::new(r.at(root), Vector3::new(0.0, 0.0, 0.0), root);
+        let mut rec = HitRecord::new(
+            r.at(root),
+            Vector3::new(0.0, 0.0, 0.0),
+            root,
+            self.material.clone(),
+        );
         let outward_normal = (rec.p - self.center) / self.radius;
         rec.set_face_normal(r, outward_normal);
 

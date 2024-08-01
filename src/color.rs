@@ -32,11 +32,14 @@ pub fn ray_color(ray: &Ray, depth: i32, world: &HittableList) -> Vector3 {
     }
 
     if let Some(hit_record) = world.hit(ray, 0.001, INFINITY) {
-        let direction = hit_record.normal + Vector3::random_unit_vector();
-        return 0.5 * ray_color(&Ray::new(hit_record.p, direction), depth - 1, world);
+        return match hit_record.material.scatter(ray, &hit_record) {
+            Some((attenuation, scattered)) => attenuation * ray_color(&scattered, depth - 1, world),
+            None => Vector3::new(0.0, 0.0, 0.0),
+        };
     }
 
     let unit_direction = ray.direction.unit_vector();
     let a = 0.5 * (unit_direction[1] + 1.0);
-    return (1.0 - a) * Vector3::new(1.0, 1.0, 1.0) + a * Vector3::new(0.5, 0.7, 1.0);
+
+    (1.0 - a) * Vector3::new(1.0, 1.0, 1.0) + a * Vector3::new(0.5, 0.7, 1.0)
 }

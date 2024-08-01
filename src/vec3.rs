@@ -66,7 +66,12 @@ impl Vector3 {
         if on_unit_sphere.dot(normal) > 0.0 {
             return on_unit_sphere;
         }
-        return -on_unit_sphere;
+        -on_unit_sphere
+    }
+
+    pub fn near_zero(&self) -> bool {
+        let s = 1e-8;
+        self.e.iter().all(|&dimension| dimension < s)
     }
 }
 

@@ -1,19 +1,23 @@
-use crate::{ray::Ray, vec3::Vector3};
+use std::sync::Arc;
+
+use crate::{materials::Scatterable, ray::Ray, vec3::Vector3};
 
 pub struct HitRecord {
     pub p: Vector3,
     pub normal: Vector3,
     pub t: f64,
     pub front_face: bool,
+    pub material: Arc<dyn Scatterable>,
 }
 
 impl HitRecord {
-    pub fn new(p: Vector3, normal: Vector3, t: f64) -> Self {
+    pub fn new(p: Vector3, normal: Vector3, t: f64, material: Arc<dyn Scatterable>) -> Self {
         HitRecord {
             p,
             normal,
             t,
             front_face: false,
+            material,
         }
     }
 
