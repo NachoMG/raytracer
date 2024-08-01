@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use camera::Camera;
 use hittable::HittableList;
-use materials::{Lambertian, Metal};
+use materials::{Dielectric, Lambertian, Metal};
 use sphere::Sphere;
 use vec3::Vector3;
 
@@ -19,7 +19,7 @@ fn main() {
 
     let material_ground = Arc::new(Lambertian::new(Vector3::new(0.8, 0.8, 0.0)));
     let material_center = Arc::new(Lambertian::new(Vector3::new(0.1, 0.2, 0.5)));
-    let material_left = Arc::new(Metal::new(Vector3::new(0.8, 0.8, 0.8), 0.3));
+    let material_left = Arc::new(Dielectric::new(1.0 / 1.33));
     let material_right = Arc::new(Metal::new(Vector3::new(0.8, 0.6, 0.2), 1.0));
 
     world.push(Sphere::new(

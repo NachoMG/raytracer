@@ -53,3 +53,38 @@ impl Scatterable for Metal {
         }
     }
 }
+pub struct Dielectric {
+    refraction_index: f64,
+}
+
+impl Dielectric {
+    pub fn new(refraction_index: f64) -> Dielectric {
+        Dielectric { refraction_index }
+    }
+}
+
+impl Scatterable for Dielectric {
+    fn scatter(&self, r_in: &Ray, hit_record: &HitRecord) -> Option<(Vector3, Ray)> {
+        let albedo = Vector3::new(1.0, 1.0, 1.0);
+        let refraction_index = if hit_record.front_face {
+            1.0 / self.refraction_index
+        } else {
+            self.refraction_index
+        };
+
+        let unit_direction = r_in.direction.unit_vector();
+        let cos_theta = (-unit_direction).dot(hit_record.normal).min(1.0);
+        let sin_theta = (1.0 - cos_theta * cos_theta).sqrt();
+
+        let cannot_refract = refraction_index * sin_theta > 1.0;
+        let direction = if (cannot_refract) {
+            Vector3::reflect(unit_direction, hit_record.normal)
+        } else {
+            Vector3::refract(unit_direction, hit_record.normal, refraction_index)
+        };
+
+        let scattered_ray = Ray::new(hit_record.p, direction);
+
+        Some((albedo, scattered_ray))
+    }
+}

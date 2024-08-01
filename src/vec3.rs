@@ -77,6 +77,13 @@ impl Vector3 {
     pub fn reflect(vector: Vector3, normal: Vector3) -> Vector3 {
         vector - 2.0 * vector.dot(normal) * normal
     }
+
+    pub fn refract(unit_vector: Vector3, normal: Vector3, etai_over_etat: f64) -> Vector3 {
+        let cos_theta = (-unit_vector).dot(normal).min(1.0);
+        let r_out_perp = etai_over_etat * (unit_vector + cos_theta * normal);
+        let r_out_parallel = -(1.0 - r_out_perp.length_squared()).abs().sqrt() * normal;
+        r_out_perp + r_out_parallel
+    }
 }
 
 impl Index<usize> for Vector3 {
