@@ -25,3 +25,21 @@ impl Scatterable for Lambertian {
         Some((self.albedo, scattered_ray))
     }
 }
+
+pub struct Metal {
+    albedo: Vector3,
+}
+
+impl Metal {
+    pub fn new(albedo: Vector3) -> Metal {
+        Metal { albedo }
+    }
+}
+
+impl Scatterable for Metal {
+    fn scatter(&self, r_in: &Ray, hit_record: &HitRecord) -> Option<(Vector3, Ray)> {
+        let reflection = Vector3::reflect(r_in.direction, hit_record.normal);
+        let scattered_ray = Ray::new(hit_record.p, reflection);
+        Some((self.albedo, scattered_ray))
+    }
+}

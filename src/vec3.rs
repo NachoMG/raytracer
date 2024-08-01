@@ -73,6 +73,10 @@ impl Vector3 {
         let s = 1e-8;
         self.e.iter().all(|&dimension| dimension < s)
     }
+
+    pub fn reflect(vector: Vector3, normal: Vector3) -> Vector3 {
+        vector - 2.0 * vector.dot(normal) * normal
+    }
 }
 
 impl Index<usize> for Vector3 {
