@@ -1,3 +1,5 @@
+use rand::Rng;
+
 use crate::{hittable::HitRecord, ray::Ray, vec3::Vector3};
 
 pub trait Scatterable {
@@ -61,6 +63,12 @@ impl Dielectric {
     pub fn new(refraction_index: f64) -> Dielectric {
         Dielectric { refraction_index }
     }
+
+    fn reflectance(cosine: f64, refraction_index: f64) -> f64 {
+        // Use Schlick's approximation for reflectance.
+        let r0 = ((1.0 - refraction_index) / (1.0 + refraction_index)).powi(2);
+        r0 + (1.0 - r0) * (1.0 - cosine).powi(5)
+    }
 }
 
 impl Scatterable for Dielectric {
@@ -77,7 +85,10 @@ impl Scatterable for Dielectric {
         let sin_theta = (1.0 - cos_theta * cos_theta).sqrt();
 
         let cannot_refract = refraction_index * sin_theta > 1.0;
-        let direction = if (cannot_refract) {
+        let direction = if cannot_refract
+            || Dielectric::reflectance(cos_theta, refraction_index)
+                > rand::thread_rng().gen_range(0.0..1.0)
+        {
             Vector3::reflect(unit_direction, hit_record.normal)
         } else {
             Vector3::refract(unit_direction, hit_record.normal, refraction_index)
