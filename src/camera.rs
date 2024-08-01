@@ -4,20 +4,20 @@ use crate::{
     color::{ray_color, write_color},
     hittable::HittableList,
     ray::Ray,
+    utils::degrees_to_radians,
     vec3::Vector3,
 };
 
 pub struct Camera {
-    aspect_ratio: f64,
-    image_width: i32,
-    image_height: i32,
-    center: Vector3,
-    pixel00_loc: Vector3,
-    pixel_delta_u: Vector3,
-    pixel_delta_v: Vector3,
-    samples_per_pixel: i32,
-    pixel_samples_scale: f64,
-    max_depth: i32,
+    image_width: i32,         // Rendered image width in pixel count
+    image_height: i32,        // Rendered image height in pixel count
+    center: Vector3,          //
+    pixel00_loc: Vector3,     //
+    pixel_delta_u: Vector3,   //
+    pixel_delta_v: Vector3,   //
+    samples_per_pixel: i32,   // Count of random samples for each pixel
+    pixel_samples_scale: f64, //
+    max_depth: i32,           // Maximum number of ray bounces into scene
 }
 
 impl Camera {
@@ -26,6 +26,7 @@ impl Camera {
         aspect_ratio: f64,
         samples_per_pixel: i32,
         max_depth: i32,
+        v_fov: f64,
     ) -> Camera {
         let mut image_height = ((image_width as f64) / aspect_ratio) as i32;
         if image_height < 1 {
@@ -38,7 +39,9 @@ impl Camera {
 
         // Determine viewport dimensions.
         let focal_length = 1.0;
-        let viewport_height = 2.0;
+        let theta = degrees_to_radians(v_fov);
+        let h = (theta / 2.0).tan();
+        let viewport_height = 2.0 * h * focal_length;
         let viewport_width = viewport_height * (image_width as f64 / image_height as f64);
 
         // Calculate the vectors across the horizontal and down the vertical viewport edges.
@@ -55,7 +58,6 @@ impl Camera {
         let pixel00_loc = viewport_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v);
 
         Camera {
-            aspect_ratio,
             image_width,
             image_height,
             center,
