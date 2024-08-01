@@ -28,18 +28,28 @@ impl Scatterable for Lambertian {
 
 pub struct Metal {
     albedo: Vector3,
+    fuzz: f64,
 }
 
 impl Metal {
-    pub fn new(albedo: Vector3) -> Metal {
-        Metal { albedo }
+    pub fn new(albedo: Vector3, fuzz: f64) -> Metal {
+        Metal {
+            albedo,
+            fuzz: if fuzz < 1.0 { fuzz } else { 1.0 },
+        }
     }
 }
 
 impl Scatterable for Metal {
     fn scatter(&self, r_in: &Ray, hit_record: &HitRecord) -> Option<(Vector3, Ray)> {
-        let reflection = Vector3::reflect(r_in.direction, hit_record.normal);
+        let reflection = Vector3::reflect(r_in.direction, hit_record.normal)
+            + (self.fuzz * Vector3::random_unit_vector());
         let scattered_ray = Ray::new(hit_record.p, reflection);
-        Some((self.albedo, scattered_ray))
+
+        if scattered_ray.direction.dot(hit_record.normal) > 0.0 {
+            Some((self.albedo, scattered_ray))
+        } else {
+            None
+        }
     }
 }
